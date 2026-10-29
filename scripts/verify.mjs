@@ -8,3 +8,22 @@ for(const file of html){const content=await readFile(file,'utf8');assert(content
 assert((await readFile('dist/CNAME','utf8')).trim()==='volonterski.ru');
 for(const filename of ['rss.xml','sitemap.xml']){const content=await readFile(path.join(root,filename),'utf8');assert(content.includes('https://volonterski.ru'));}
 console.log(`Verified ${html.length} HTML pages, local links/assets, RSS, sitemap and domain.`);
+for (const file of html) {
+  const content = await readFile(file, 'utf8');
+  const image = content.match(/property="og:image" content="([^"]+)"/);
+  assert(image, `${file}: missing social preview`);
+  const imageUrl = new URL(image[1]);
+  assert.equal(imageUrl.origin, 'https://volonterski.ru');
+  const png = await readFile(path.join(root, imageUrl.pathname));
+  assert.equal(png.toString('hex',0,8), '89504e470d0a1a0a');
+  assert.equal(png.readUInt32BE(16), 1200);
+  assert.equal(png.readUInt32BE(20), 630);
+  const schemas = [...content.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map(match=>JSON.parse(match[1]));
+  if (file.includes(`${path.sep}articles${path.sep}`)) {
+    assert.equal(schemas.length, 1, `${file}: missing article schema`);
+    assert.equal(schemas[0]['@type'], 'BlogPosting');
+    assert(!schemas[0].author, `${file}: unexpected personal attribution`);
+    assert(content.includes('property="og:type" content="article"'));
+  }
+}
+console.log('Verified generated PNG dimensions and article JSON-LD.');

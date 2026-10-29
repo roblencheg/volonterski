@@ -10,6 +10,7 @@
     "verify": "node scripts/verify.mjs"
   },
   "dependencies": {
+    "@resvg/resvg-js": "2.6.2",
     "astro": "7.4.4"
   },
   "engines": {

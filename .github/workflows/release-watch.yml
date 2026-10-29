@@ -1,0 +1,37 @@
+name: Watch project releases
+on:
+  push:
+    branches: [main]
+    paths:
+      - config/project-sources.json
+      - scripts/release-watch.mjs
+      - .github/workflows/release-watch.yml
+  schedule:
+    - cron: '47 4 * * *'
+  workflow_dispatch:
+permissions:
+  contents: write
+  pull-requests: write
+concurrency:
+  group: project-release-watch
+  cancel-in-progress: false
+jobs:
+  propose:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - name: Prepare editorial update proposals
+        run: node scripts/release-watch.mjs
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: release-update-proposals
+          path: .cache/release-proposals/
+          if-no-files-found: ignore
+          retention-days: 14

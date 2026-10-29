@@ -1,6 +1,7 @@
 ---
 import '../styles/global.css';
-const { title = 'Записи', description = 'Статьи, инструкции и файлы.', noindex = false } = Astro.props;
+import { imageURL, safeJSON } from '../lib/seo';
+const { title = 'Записи', description = 'Статьи, инструкции и файлы.', noindex = false, image = imageURL('index'), article = null, structuredData = null } = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
@@ -12,7 +13,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <link rel="canonical" href={canonical} /><link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="alternate" type="application/rss+xml" title="volonterski" href="/rss.xml" />
   <meta property="og:title" content={title} /><meta property="og:description" content={description} />
-  <meta property="og:type" content="website" /><meta property="og:url" content={canonical} /><meta property="og:locale" content="ru_RU" />
+  <meta property="og:type" content={article ? 'article' : 'website'} /><meta property="og:url" content={canonical} /><meta property="og:locale" content="ru_RU" />
+  <meta property="og:image" content={image} /><meta property="og:image:width" content="1200" /><meta property="og:image:height" content="630" /><meta property="og:image:alt" content={title} />
+  <meta name="twitter:card" content="summary_large_image" /><meta name="twitter:title" content={title} /><meta name="twitter:description" content={description} /><meta name="twitter:image" content={image} />
+  {article && <><meta property="article:published_time" content={article.date.toISOString()} /><meta property="article:modified_time" content={(article.updated || article.date).toISOString()} />{article.tags.map((tag: string) => <meta property="article:tag" content={tag} />)}</>}
+  {structuredData && <script is:inline type="application/ld+json" set:html={safeJSON(structuredData)} />}
+  {import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION && <meta name="google-site-verification" content={import.meta.env.PUBLIC_GOOGLE_SITE_VERIFICATION} />}
+  {import.meta.env.PUBLIC_YANDEX_SITE_VERIFICATION && <meta name="yandex-verification" content={import.meta.env.PUBLIC_YANDEX_SITE_VERIFICATION} />}
+  {import.meta.env.PUBLIC_BING_SITE_VERIFICATION && <meta name="msvalidate.01" content={import.meta.env.PUBLIC_BING_SITE_VERIFICATION} />}
   {noindex && <meta name="robots" content="noindex" />}
   <script is:inline>try { const t=localStorage.getItem('theme'); document.documentElement.dataset.theme=t==='dark'||t==='light'?t:(matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light'); } catch {}</script>
 </head>

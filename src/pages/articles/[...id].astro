@@ -1,16 +1,19 @@
 ---
 import { render } from 'astro:content';
+import { articleSchema, imageURL } from '../../lib/seo';
 import Base from '../../layouts/Base.astro';
 import { published, formatDate, readingTime } from '../../lib/articles';
 export async function getStaticPaths(){return (await published()).map(article=>({params:{id:article.id},props:{article}}));}
 const {article}=Astro.props;
 const { Content, headings }=await render(article);
+const related=(await published()).filter(a=>a.id!==article.id).map(a=>({article:a,score:a.data.tags.filter(tag=>article.data.tags.includes(tag)).length})).filter(a=>a.score>0).sort((a,b)=>b.score-a.score || b.article.data.date.valueOf()-a.article.data.date.valueOf()).slice(0,3);
 ---
-<Base title={article.data.title} description={article.data.description}>
+<Base title={article.data.title} description={article.data.description} image={imageURL(article.id)} article={article.data} structuredData={articleSchema(article)}>
   <article class="article-page"><a class="back-link" href="/">← Все записи</a><header class="article-header"><div class="eyebrow">{article.data.tags.join(' / ')}</div><h1>{article.data.title}</h1><p class="article-lead">{article.data.description}</p><div class="article-meta"><time datetime={article.data.date.toISOString()}>{formatDate(article.data.date)}</time><span>·</span><span>{readingTime(article.body)} мин чтения</span></div>{article.data.updated && <p class="updated">Обновлено {formatDate(article.data.updated)}</p>}</header>
     {headings.filter(h=>h.depth===2).length>1 && <details class="toc"><summary>Содержание</summary><ol>{headings.filter(h=>h.depth===2).map(h=><li><a href={`#${h.slug}`}>{h.text}</a></li>)}</ol></details>}
     <div class="prose"><Content /></div>
     {article.data.attachments.length>0 && <section class="attachments"><h2>Файлы</h2>{article.data.attachments.map(file=><a href={file.url} download class="file"><span><strong>{file.name}</strong>{file.size && <small>{file.size}</small>}</span><span aria-hidden="true">↓</span></a>)}</section>}
+    {related.length>0 && <aside class="related" aria-label="Статьи по теме"><h2>По теме</h2><ul>{related.map(({article:a})=><li><a href={`/articles/${a.id}/`}>{a.data.title}</a></li>)}</ul></aside>}
     <div class="article-end"><a href="/">← Все записи</a><button id="share" class="text-button">Скопировать ссылку</button><span id="share-status" role="status" class="sr-only"></span></div>
   </article>
 </Base>

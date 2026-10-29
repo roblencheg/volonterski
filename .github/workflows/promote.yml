@@ -1,0 +1,42 @@
+name: Notify search engines
+on:
+  workflow_run:
+    workflows: [Build and deploy journal]
+    types: [completed]
+    branches: [main]
+  schedule:
+    - cron: '17 3 * * *'
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: search-notifications
+  cancel-in-progress: false
+jobs:
+  indexnow:
+    if: >-
+      github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' &&
+       github.event.workflow_run.event != 'pull_request' &&
+       github.event.workflow_run.head_repository.full_name == github.repository)
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: actions/cache/restore@v4
+        with:
+          path: .cache/indexnow.json
+          key: indexnow-v1-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: indexnow-v1-
+      - name: Submit changed pages after verifying deployed commit
+        run: node scripts/indexnow.mjs
+      - uses: actions/cache/save@v4
+        if: always()
+        with:
+          path: .cache/indexnow.json
+          key: indexnow-v1-${{ github.run_id }}-${{ github.run_attempt }}

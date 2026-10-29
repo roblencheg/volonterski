@@ -1,0 +1,17 @@
+[
+  {
+    "repository": "roblencheg/HAVAL_H3",
+    "article": "gwm-ru-home-assistant",
+    "reviewedRelease": "v1.1.7"
+  },
+  {
+    "repository": "roblencheg/cesar-smart-hass",
+    "article": "cesar-smart-home-assistant",
+    "reviewedRelease": "v0.1.13"
+  },
+  {
+    "repository": "roblencheg/haval_h3_telemetry",
+    "article": "haval-h3-telemetry",
+    "reviewedRelease": "v1.2.1"
+  }
+]

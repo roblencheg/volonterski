@@ -156,3 +156,9 @@ footer a:hover { color: var(--fg); }
   .brand { font-size: 17px; }
   .theme-toggle { width: 38px; margin-right: -9px; }
 }
+
+.related { margin-top: 44px; padding-top: 28px; border-top: 1px solid var(--line); }
+.related h2 { font-size: 18px; font-weight: 500; margin: 0 0 18px; }
+.related ul { list-style: none; margin: 0; padding: 0; }
+.related li { margin: 12px 0; font-size: 14px; line-height: 1.6; }
+.related a:hover { color: var(--accent); }
