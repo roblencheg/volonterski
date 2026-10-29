@@ -1,0 +1,65 @@
+---
+import Base from '../layouts/Base.astro';
+import { published, formatDate, readingTime, articleURL } from '../lib/articles';
+const articles = await published();
+const tags = [...new Set(articles.flatMap(a => a.data.tags))].sort((a,b)=>a.localeCompare(b,'ru'));
+---
+<Base>
+  <section class="archive" aria-labelledby="archive-title">
+    <header class="archive-header">
+      <h1 id="archive-title">Записи <span class="count">{articles.length}</span></h1>
+      <label class="search">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m16 16 4.5 4.5"/></svg>
+        <input id="search" type="search" placeholder="Поиск" aria-label="Поиск по текстам записей" autocomplete="off" />
+        <kbd aria-hidden="true">/</kbd>
+      </label>
+    </header>
+    {tags.length>0 && <div class="filters" aria-label="Фильтр по теме">
+      <button class="filter active" data-tag="" aria-pressed="true">Все</button>
+      {tags.map(tag=><button class="filter" data-tag={tag} aria-pressed="false">{tag}</button>)}
+    </div>}
+    <p id="results-status" class="sr-only" role="status" aria-live="polite"></p>
+    <div id="articles" class="article-list">{articles.map(article=><article class="article-row" data-id={article.id} data-tags={JSON.stringify(article.data.tags)} data-search={`${article.data.title} ${article.data.description} ${article.data.tags.join(' ')} ${article.body || ''}`.toLocaleLowerCase('ru')}>
+      <time class="row-date" datetime={article.data.date.toISOString()}>{formatDate(article.data.date)}</time>
+      <div class="row-content">
+        <h2><a href={articleURL(article.id)}>{article.data.title}<span class="row-arrow" aria-hidden="true">→</span></a></h2>
+        <p>{article.data.description}</p>
+        <div class="article-meta"><span>{readingTime(article.body)} мин</span>{article.data.tags.map(tag=><span>{tag}</span>)}{article.data.attachments.length>0 && <span>Файлы: {article.data.attachments.length}</span>}</div>
+      </div>
+    </article>)}</div>
+    <div id="empty-state" class="empty-state" hidden={articles.length>0}>
+      <p id="empty-message">{articles.length ? 'Ничего не найдено.' : 'Публикаций пока нет.'}</p>
+      <button id="reset-search" class="text-button" hidden>Сбросить поиск</button>
+    </div>
+    <noscript><p class="notice">Для поиска и фильтров нужен JavaScript.</p></noscript>
+  </section>
+</Base>
+<script>
+  const input=document.querySelector<HTMLInputElement>('#search')!;
+  const rows=[...document.querySelectorAll<HTMLElement>('.article-row')];
+  const buttons=[...document.querySelectorAll<HTMLButtonElement>('.filter')];
+  const empty=document.querySelector<HTMLElement>('#empty-state')!;
+  const reset=document.querySelector<HTMLButtonElement>('#reset-search')!;
+  let tag='';
+  function filter(){
+    const words=input.value.trim().toLocaleLowerCase('ru').split(/\s+/).filter(Boolean);
+    let count=0;
+    rows.forEach(row=>{
+      const visible=(!tag||JSON.parse(row.dataset.tags!).includes(tag))&&words.every(word=>row.dataset.search!.includes(word));
+      row.hidden=!visible;if(visible)count++;
+    });
+    empty.hidden=count>0;
+    document.querySelector('#empty-message')!.textContent=rows.length?'Ничего не найдено.':'Публикаций пока нет.';
+    reset.hidden=!input.value&&!tag;
+    document.querySelector('#results-status')!.textContent=`Найдено записей: ${count}`;
+    buttons.forEach(btn=>{const selected=btn.dataset.tag===tag;btn.classList.toggle('active',selected);btn.setAttribute('aria-pressed',String(selected));});
+  }
+  input.addEventListener('input',filter);
+  buttons.forEach(btn=>btn.addEventListener('click',()=>{tag=btn.dataset.tag!;filter();}));
+  reset.addEventListener('click',()=>{input.value='';tag='';filter();input.focus();});
+  document.addEventListener('keydown',event=>{
+    const target=event.target as HTMLElement;
+    if(event.key==='/'&&!event.ctrlKey&&!event.metaKey&&!event.altKey&&!target.closest('input,textarea,select,[contenteditable]')){event.preventDefault();input.focus();}
+    if(event.key==='Escape'&&document.activeElement===input){input.value='';filter();input.blur();}
+  });
+</script>

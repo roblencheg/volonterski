@@ -1,0 +1,2 @@
+import { published, articleURL } from '../lib/articles';
+export async function GET(){const articles=await published();return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${['/'].map(p=>`<url><loc>https://volonterski.ru${p}</loc></url>`).join('')}${articles.map(a=>`<url><loc>https://volonterski.ru${articleURL(a.id)}</loc><lastmod>${(a.data.updated||a.data.date).toISOString()}</lastmod></url>`).join('')}</urlset>`,{headers:{'Content-Type':'application/xml; charset=utf-8'}});}
