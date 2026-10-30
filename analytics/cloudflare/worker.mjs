@@ -6,7 +6,7 @@ const out=(body,status=200,headers={})=>new Response(body,{status,headers:{...HE
 const json=x=>out(JSON.stringify(x),200,{'Content-Type':'application/json; charset=utf-8'});
 const e=new TextEncoder();
 function equal(a,b){const x=e.encode(a),y=e.encode(b);let d=x.length^y.length;for(let i=0;i<Math.max(x.length,y.length);i++)d|=(x[i]||0)^(y[i]||0);return d===0;}
-function auth(req,env){if(!env.ADMIN_USER||!env.ADMIN_PASSWORD||env.ADMIN_PASSWORD.length<16)return false;const h=req.headers.get('Authorization')||'';if(!h.startsWith('Basic '))return false;try{const s=atob(h.slice(6)),i=s.indexOf(':');return i>0&&equal(s.slice(0,i),env.ADMIN_USER)&&equal(s.slice(i+1),env.ADMIN_PASSWORD);}catch{return false;}}
+function auth(req,env){if(!env.ADMIN_USER||!env.ADMIN_PASSWORD||env.ADMIN_PASSWORD.length<16)return false;const h=req.headers.get('Authorization')||'';if(!h.startsWith('Basic '))return false;try{const bytes=Uint8Array.from(atob(h.slice(6)),c=>c.charCodeAt(0));const s=new TextDecoder('utf-8',{fatal:true}).decode(bytes),i=s.indexOf(':');return i>0&&equal(s.slice(0,i),env.ADMIN_USER)&&equal(s.slice(i+1),env.ADMIN_PASSWORD);}catch{return false;}}
 function valid(b){if(!b||typeof b!=='object'||Array.isArray(b))return null;const p=b.path;if(!(p==='/'||typeof p==='string'&&/^\/articles\/[a-z0-9-]+\/$/.test(p)))return null;if(typeof b.session!=='string'||!/^[0-9a-f-]{36}$/.test(b.session))return null;const name=b.event||'pageview';if(name!=='pageview'&&!EVENTS.has(name))return null;return {path:p,session:b.session,name,source:typeof b.source==='string'&&/^[a-z0-9][a-z0-9._-]{0,49}$/.test(b.source)?b.source:'direct'};}
 async function collect(req,env){
  if(req.headers.get('Origin')!==SITE)return out('Forbidden',403);
@@ -52,7 +52,7 @@ export default {
   if(path==='/health')return out('ok',200,{'Content-Type':'text/plain'});
   if(path==='/collect')return collect(req,env);
   if(['/dashboard','/dashboard.js','/api/report'].includes(path)){
-   if(!auth(req,env))return out('Authorization required',401,{'WWW-Authenticate':'Basic realm="Site Statistics"'});
+   if(!auth(req,env))return out('Authorization required',401,{'WWW-Authenticate':'Basic realm="Site Statistics", charset="UTF-8"'});
    if(req.method!=='GET')return out('Method not allowed',405);
    if(path==='/dashboard')return out(html,200,{'Content-Type':'text/html; charset=utf-8','Content-Security-Policy':"default-src 'none';script-src 'self';style-src 'unsafe-inline';connect-src 'self';base-uri 'none';frame-ancestors 'none'"});
    if(path==='/dashboard.js')return out(js,200,{'Content-Type':'text/javascript; charset=utf-8'});
