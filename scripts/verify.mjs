@@ -35,11 +35,11 @@ console.log('Verified generated PNG dimensions and article JSON-LD.');
 
 const origin = 'https://volonterski.ru';
 const robots = await readFile(path.join(root, 'robots.txt'), 'utf8');
-assert.match(robots, /User-agent:\\s*\\*/i);
-assert.match(robots, /Sitemap:\\s*https:\\/\\/volonterski\\.ru\\/sitemap\\.xml/i);
-assert(!/Disallow:\\s*\\//i.test(robots), 'Robots blocks crawlable pages');
+assert.match(robots, /User-agent:\s*\*/i);
+assert.match(robots, /Sitemap:\s*https:\/\/volonterski\.ru\/sitemap\.xml/i);
+assert(!/Disallow:\s*\//i.test(robots), 'Robots blocks crawlable pages');
 const sitemap = await readFile(path.join(root, 'sitemap.xml'), 'utf8');
-const locations = [...sitemap.matchAll(/<loc>([^<]+)<\\/loc>/g)].map(m => m[1]);
+const locations = [...sitemap.matchAll(/<loc>([^<]+)<\/loc>/g)].map(m => m[1]);
 assert(locations.length > 1, 'Expected home and published articles in sitemap');
 assert.equal(new Set(locations).size, locations.length, 'Duplicate URLs in sitemap');
 const htmlFor = (url) => {
@@ -48,7 +48,7 @@ const htmlFor = (url) => {
 };
 for (const url of locations) {
   assert(url.startsWith(origin + '/'), `Off-site URL in sitemap: ${url}`);
-  assert(url === origin + '/' || /^https:\\/\\/volonterski\\.ru\\/articles\\/[a-z0-9-]+\\/$/.test(url), `Noncanonical URL in sitemap: ${url}`);
+  assert(url === origin + '/' || /^https:\/\/volonterski\.ru\/articles\/[a-z0-9-]+\/$/.test(url), `Noncanonical URL in sitemap: ${url}`);
   assert((await stat(htmlFor(url))).isFile(), `Sitemap location missing: ${url}`);
 }
 const titles = new Set();
@@ -56,7 +56,7 @@ const descriptions = new Set();
 for (const file of html) {
   const content = await readFile(file, 'utf8');
   const relative = path.relative(root, file).replaceAll(path.sep, '/');
-  const title = content.match(/<title>([^<]+)<\\/title>/)?.[1];
+  const title = content.match(/<title>([^<]+)<\/title>/)?.[1];
   const description = content.match(/<meta name="description" content="([^"]+)"/)?.[1];
   const canonical = content.match(/<link rel="canonical" href="([^"]+)"/)?.[1];
   assert(title && title.length >= 12 && title.length <= 160, `${relative}: missing/invalid title`);
@@ -71,7 +71,7 @@ for (const file of html) {
     assert(content.includes('<h1'), `${relative}: missing h1`);
   }
   if (relative === 'index.html') {
-    const schemas = [...content.matchAll(/<script\\b[^>]*type="application\\/ld\\+json"[^>]*>([\\s\\S]*?)<\\/script>/g)].map(m => JSON.parse(m[1]));
+    const schemas = [...content.matchAll(/<script\b[^>]*type="application\/ld\+json"[^>]*>([\s\S]*?)<\/script>/g)].map(m => JSON.parse(m[1]));
     assert(schemas.some(schema => schema['@type'] === 'WebSite' && schema.url === origin + '/'), 'Homepage missing WebSite schema');
     assert(content.includes('Home Assistant') && content.includes('AI-боты'), 'Homepage missing topic context');
   }
