@@ -36,6 +36,11 @@ const sql = {
   sources:db.prepare('SELECT source,SUM(views) AS views FROM sources WHERE day>=? GROUP BY source ORDER BY views DESC LIMIT 20'),
   events:db.prepare('SELECT name,SUM(count) AS count FROM events WHERE day>=? GROUP BY name ORDER BY count DESC')
 };
+function pruneSessions() {
+  sql.prune.run(new Date(Date.now()-2*86400000).toISOString().slice(0,10));
+}
+pruneSessions();
+setInterval(pruneSessions,12*60*60*1000).unref();
 const allowedEvents = new Set(['github_click','file_download','code_copy','search_used','article_read_75','article_read_100','share_click']);
 const origins=new Set([siteOrigin]);
 if(process.env.DEV_ORIGIN) origins.add(new URL(process.env.DEV_ORIGIN).origin);
@@ -116,7 +121,6 @@ const server=http.createServer(async(req,res)=>{
       try{payload=validate(JSON.parse(Buffer.concat(chunks).toString('utf8')));}catch{}
       if(!payload)return send(res,400,'',cors);
       record(payload);
-      if(Math.random()<0.002)sql.prune.run(new Date(Date.now()-2*86400000).toISOString().slice(0,10));
       return send(res,204,'',cors);
     }
     if(url.pathname==='/dashboard'&&req.method==='GET'){
