@@ -29,3 +29,9 @@ test('admin accepts only valid credentials and duration',async()=>{
  assert.equal((await worker.fetch(request('/api/report?days=99',{headers}),env)).status,400);
  assert.equal((await worker.fetch(request('/dashboard',{headers:{Authorization:'Basic '+Buffer.from('admin:incorrect').toString('base64')}}),env)).status,401);
 });
+test('UTF-8 credentials work with browser Basic Auth',async()=>{
+ const env={ADMIN_USER:'админ',ADMIN_PASSWORD:'секретный-пароль-длиннее-16'};
+ const credentials=Buffer.from('админ:секретный-пароль-длиннее-16','utf8').toString('base64');
+ const result=await worker.fetch(request('/dashboard',{headers:{Authorization:'Basic '+credentials}}),env);
+ assert.equal(result.status,200);
+});
