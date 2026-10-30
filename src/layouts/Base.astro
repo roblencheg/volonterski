@@ -37,18 +37,15 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       </nav>
     </header>
     <main id="main"><slot /></main>
-    <footer><a href="/rss.xml">RSS</a><button id="analytics-settings" type="button" class="analytics-settings">Настройки аналитики</button></footer>
+    <footer><a href="/rss.xml">RSS</a><button id="analytics-settings" type="button" class="analytics-settings">Об аналитике</button></footer>
   </div>
   <script is:inline src="/analytics.js" data-analytics-config data-umami-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID || ''} data-clarity-id={import.meta.env.PUBLIC_CLARITY_PROJECT_ID || ''} defer></script>
   <style is:global>
     .analytics-settings { appearance:none; border:0; padding:0; background:none; color:inherit; font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:3px; margin-left:16px; }
-    .analytics-consent { position:fixed; z-index:200; bottom:16px; left:50%; transform:translateX(-50%); width:min(680px,calc(100% - 32px)); background:var(--bg,Canvas); color:var(--text,CanvasText); border:1px solid currentColor; border-radius:12px; padding:18px; box-shadow:0 8px 32px #0003; display:flex; gap:18px; align-items:center; }
-    .analytics-consent strong { font-size:1rem; }
-    .analytics-consent p { font-size:.85rem; line-height:1.5; margin:6px 0 0; }
-    .analytics-actions { display:flex; gap:8px; flex-shrink:0; }
-    .analytics-actions button { font:inherit; font-size:.85rem; padding:9px 12px; border:1px solid currentColor; border-radius:8px; background:transparent; color:inherit; cursor:pointer; }
-    .analytics-actions button[data-consent="yes"] { background:currentColor; color:Canvas; }
-    @media(max-width:620px) { .analytics-consent { flex-direction:column; align-items:stretch; } .analytics-actions { justify-content:flex-end; } }
+    .analytics-consent { position:fixed; z-index:200; bottom:12px; left:50%; transform:translateX(-50%); width:min(360px,calc(100% - 24px)); box-sizing:border-box; background:var(--bg,Canvas); color:var(--text,CanvasText); border:1px solid currentColor; border-radius:10px; padding:10px 12px; box-shadow:0 6px 24px #0002; display:flex; gap:10px; align-items:center; }
+    .analytics-consent p { font-size:.76rem; line-height:1.35; margin:0; min-width:0; flex:1; }
+    .analytics-consent button { font:inherit; font-size:.76rem; white-space:nowrap; padding:7px 9px; border:1px solid currentColor; border-radius:7px; background:transparent; color:inherit; cursor:pointer; flex-shrink:0; }
+    @media(max-width:400px) { .analytics-consent { gap:7px; padding:9px; } .analytics-consent p { font-size:.72rem; } .analytics-consent button { font-size:.72rem; padding:6px; } }
   </style>
   <script>
     const toggle = document.querySelector<HTMLButtonElement>('#theme-toggle');
