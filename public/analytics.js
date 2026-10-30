@@ -5,7 +5,7 @@
   if (!config) return;
   const umamiId = (config.dataset.umamiId || '').trim();
   const clarityId = (config.dataset.clarityId || '').trim();
-  if (!umamiId && !clarityId) return;
+  if (!umamiId && !clarityId) { document.querySelector('#analytics-settings')?.remove(); return; }
   const key = 'volonterski-analytics-consent-v1';
   const storage = {
     get() { try { return localStorage.getItem(key); } catch { return null; } },
