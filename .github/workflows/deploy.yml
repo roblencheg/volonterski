@@ -25,15 +25,24 @@ jobs:
           PUBLIC_BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           PUBLIC_UMAMI_WEBSITE_ID: ${{ vars.UMAMI_WEBSITE_ID }}
           PUBLIC_CLARITY_PROJECT_ID: ${{ vars.CLARITY_PROJECT_ID || 'z5wgas0mfw' }}
+          PUBLIC_ANALYTICS_ENDPOINT: ${{ vars.ANALYTICS_ENDPOINT }}
       - run: npm run verify
       - run: node --test tests/promotion.test.mjs
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
         with:
           path: dist
+  backend-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - run: node --test analytics/server.test.mjs
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
-    needs: build
+    needs: [build, backend-test]
     runs-on: ubuntu-latest
     permissions:
       pages: write
