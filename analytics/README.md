@@ -18,8 +18,8 @@
 
 ## Однократная активация Cloudflare
 
-1. Создай бесплатный аккаунт на [Cloudflare](https://dash.cloudflare.com/).
-2. Workers & Pages → Create application → импорт GitHub репозитория `roblencheg/volonterski`. Создай Worker с именем **volonterski-analytics**. Root directory: **analytics/cloudflare**. Build command не нужен; deploy command **npm run deploy**. Cloudflare автоматически развернёт Worker и привязанную D1 из `wrangler.jsonc` без заранее заданного database_id. Деплой применит SQL-миграции.
+1. Используй созданный аккаунт [Cloudflare](https://dash.cloudflare.com/).
+2. Workers & Pages → Create application → импорт GitHub репозитория `roblencheg/volonterski`. Создай Worker с именем **volonterski-analytics**. Root directory: **analytics/cloudflare**. Build command не нужен; deploy command **npm run deploy**. База D1 `volonterski-analytics` уже создана, а её `database_id` указан в `wrangler.jsonc`. Команда развёртывания сначала применит SQL-миграции, затем опубликует Worker.
 3. В настройках Worker (Settings → Variables and Secrets) добавь **секреты**: `SESSION_SALT` (случайная строка не короче 32 символов), `ADMIN_USER` (логин) и `ADMIN_PASSWORD` (случайный пароль от 16 символов). Не коммить и не присылай эти значения в чат. После сохранения настроек убедись, что Worker развернулся с обновлёнными секретами.
 4. Открой `https://<выданный-subdomain>.workers.dev/health` — ответ `ok`. По адресу `/dashboard` должна появиться HTTP Basic Auth; после входа — панель статистики.
 5. В GitHub → Settings → Secrets and variables → Actions → Variables добавь `ANALYTICS_ENDPOINT=https://<выданный-subdomain>.workers.dev/collect`. Затем запусти `Build and deploy journal` на GitHub Actions. Сборщик добавит публичный счётчик на все страницы.
