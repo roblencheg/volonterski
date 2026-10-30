@@ -39,7 +39,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '24'
-      - run: node --test analytics/server.test.mjs
+      - run: node --test analytics/cloudflare/worker.test.mjs
   deploy:
     if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
     needs: [build, backend-test]
