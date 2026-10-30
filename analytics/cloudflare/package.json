@@ -1,11 +1,12 @@
 {
   "name": "volonterski-analytics-worker",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "scripts": {
-    "deploy": "wrangler d1 migrations apply DB --remote && wrangler deploy",
-    "dev": "wrangler dev",
+    "build": "node --check worker.mjs",
+    "deploy": "npx --yes wrangler@4 d1 migrations apply DB --remote && npx --yes wrangler@4 deploy",
+    "dev": "npx --yes wrangler@4 dev",
     "test": "node --test worker.test.mjs"
-  },
-  "devDependencies": { "wrangler": "^4.0.0" }
+  }
 }
