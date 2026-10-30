@@ -39,7 +39,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <main id="main"><slot /></main>
     <footer><a href="/rss.xml">RSS</a><button id="analytics-settings" type="button" class="analytics-settings">Об аналитике</button></footer>
   </div>
-  {import.meta.env.PUBLIC_ANALYTICS_ENDPOINT && <script is:inline src="/metrics.js" data-own-analytics data-endpoint={import.meta.env.PUBLIC_ANALYTICS_ENDPOINT} defer />}
+  <script is:inline src="/metrics.js" data-own-analytics data-endpoint={import.meta.env.PUBLIC_ANALYTICS_ENDPOINT || "https://volonterski-analytics.is-fb7.workers.dev/collect"} defer />
   <script is:inline src="/analytics.js" data-analytics-config data-umami-id={import.meta.env.PUBLIC_UMAMI_WEBSITE_ID || ''} data-clarity-id={import.meta.env.PUBLIC_CLARITY_PROJECT_ID || ''} defer></script>
   <style is:global>
     .analytics-settings { appearance:none; border:0; padding:0; background:none; color:inherit; font:inherit; cursor:pointer; text-decoration:underline; text-underline-offset:3px; margin-left:16px; }
