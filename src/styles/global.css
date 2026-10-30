@@ -162,3 +162,6 @@ footer a:hover { color: var(--fg); }
 .related ul { list-style: none; margin: 0; padding: 0; }
 .related li { margin: 12px 0; font-size: 14px; line-height: 1.6; }
 .related a:hover { color: var(--accent); }
+
+/* Short topical introduction remains readable by crawlers without JavaScript. */
+.archive-intro { color: var(--muted); font-size: 14px; line-height: 1.7; max-width: 720px; margin: -18px 0 30px; }
