@@ -1,10 +1,11 @@
 ---
 import Base from '../layouts/Base.astro';
+import { websiteSchema, siteDescription } from '../lib/seo';
 import { published, formatDate, readingTime, articleURL } from '../lib/articles';
 const articles = await published();
 const tags = [...new Set(articles.flatMap(a => a.data.tags))].sort((a,b)=>a.localeCompare(b,'ru'));
 ---
-<Base>
+<Base title="Технические статьи: Home Assistant, AI, автомобили и электроника" description={siteDescription} structuredData={websiteSchema()}>
   <section class="archive" aria-labelledby="archive-title">
     <header class="archive-header">
       <h1 id="archive-title">Записи <span class="count">{articles.length}</span></h1>
@@ -14,6 +15,7 @@ const tags = [...new Set(articles.flatMap(a => a.data.tags))].sort((a,b)=>a.loca
         <kbd aria-hidden="true">/</kbd>
       </label>
     </header>
+    <p class="archive-intro">Практические разработки и инструкции: Home Assistant, автомобильная телеметрия, AI-боты и ремонт электроники.</p>
     {tags.length>0 && <div class="filters" aria-label="Фильтр по теме">
       <button class="filter active" data-tag="" aria-pressed="true">Все</button>
       {tags.map(tag=><button class="filter" data-tag={tag} aria-pressed="false">{tag}</button>)}
