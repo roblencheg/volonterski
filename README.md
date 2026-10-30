@@ -1,6 +1,6 @@
 # volonterski
 
-Личный журнал решений и результатов. Astro, Markdown, GitHub Pages. Без сервера, базы данных, внешних шрифтов и API-ключей.
+Личный журнал решений и результатов. Astro, Markdown, GitHub Pages. Сам сайт не требует собственного сервера, базы данных, внешних шрифтов и API-ключей. Опциональная аналитика использует Cloudflare Workers и D1.
 
 Адрес после подключения DNS: https://volonterski.ru.
 
@@ -26,3 +26,7 @@ npm run verify
 ## Поиск и обновления
 
 Автоматические PNG-превью, BlogPosting JSON-LD, связанные статьи, IndexNow после деплоя и мониторинг релизов проектов. [Устройство автоматизации и статус подключений](docs/PROMOTION.md).
+
+## Автономная аналитика
+
+Счётчик сайта и закрытая панель статистики могут работать без собственного сервера через Cloudflare Workers + D1. Код: [analytics/cloudflare](analytics/cloudflare), [подключение](analytics/README.md). До создания Cloudflare Worker и настройки `ANALYTICS_ENDPOINT` сбор собственных метрик выключен.
