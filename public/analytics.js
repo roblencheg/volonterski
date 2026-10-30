@@ -6,11 +6,7 @@
   const umamiId = (config.dataset.umamiId || '').trim();
   const clarityId = (config.dataset.clarityId || '').trim();
   if (!umamiId && !clarityId) { document.querySelector('#analytics-settings')?.remove(); return; }
-  const key = 'volonterski-analytics-consent-v1';
-  const storage = {
-    get() { try { return localStorage.getItem(key); } catch { return null; } },
-    set(value) { try { localStorage.setItem(key, value); } catch {} }
-  };
+  const noticeKey = 'volonterski-analytics-notice-v2';
   let enabled = false;
   const sent = new Set();
   function track(name, data = {}) {
@@ -35,29 +31,24 @@
       loadScript('https://www.clarity.ms/tag/' + clarityId);
     }
   }
-  function hide() { document.querySelector('#analytics-consent')?.remove(); }
-  function show() {
+  // Analytics is initialized automatically. Notice is informational only.
+  start();
+  function showNotice() {
     if (document.querySelector('#analytics-consent')) return;
     const panel = document.createElement('div');
     panel.id = 'analytics-consent';
     panel.className = 'analytics-consent';
-    panel.setAttribute('role', 'region');
-    panel.setAttribute('aria-label', 'Настройки аналитики');
-    panel.innerHTML = '<div><strong>Аналитика сайта</strong><p>С вашего разрешения используем Umami и Microsoft Clarity, чтобы понимать, какие материалы полезны. Clarity может записывать взаимодействия со страницей. Без согласия счётчики не загружаются.</p></div><div class="analytics-actions"><button type="button" data-consent="no">Не разрешать</button><button type="button" data-consent="yes">Разрешить</button></div>';
-    panel.addEventListener('click', (event) => {
-      const button = event.target.closest('[data-consent]');
-      if (!button) return;
-      const choice = button.dataset.consent;
-      storage.set(choice);
-      hide();
-      if (choice === 'yes') { start(); dispatchEvent(new Event('scroll')); }
-      else if (enabled) location.reload();
+    panel.setAttribute('role', 'status');
+    panel.innerHTML = '<p>Используем аналитику посещений и взаимодействий с сайтом (Microsoft Clarity и при подключении Umami).</p><button type="button" aria-label="Закрыть уведомление">Понятно</button>';
+    panel.querySelector('button').addEventListener('click', () => {
+      try { localStorage.setItem(noticeKey, 'dismissed'); } catch {}
+      panel.remove();
     });
     document.body.append(panel);
   }
-  const choice = storage.get();
-  if (choice === 'yes') start();
-  else if (choice !== 'no') show();
+  let dismissed = false;
+  try { dismissed = localStorage.getItem(noticeKey) === 'dismissed'; } catch {}
+  if (!dismissed) showNotice();
 
   document.addEventListener('click', (event) => {
     const link = event.target.closest('a[href]');
@@ -91,6 +82,5 @@
     addEventListener('resize', check, { passive: true });
     check();
   }
-  /* Visitors can reopen this preference from the footer. */
-  document.querySelector('#analytics-settings')?.addEventListener('click', () => show());
+  document.querySelector('#analytics-settings')?.addEventListener('click', showNotice);
 })();
