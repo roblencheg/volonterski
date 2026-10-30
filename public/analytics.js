@@ -39,7 +39,7 @@
     panel.id = 'analytics-consent';
     panel.className = 'analytics-consent';
     panel.setAttribute('role', 'status');
-    panel.innerHTML = '<p>Используем аналитику посещений и взаимодействий с сайтом (Microsoft Clarity и при подключении Umami).</p><button type="button" aria-label="Закрыть уведомление">Понятно</button>';
+    panel.innerHTML = '<p>Для улучшения сайта собираем обезличенные метрики посещений собственным счётчиком (после подключения), а также можем использовать Microsoft Clarity и Umami.</p><button type="button" aria-label="Закрыть уведомление">Понятно</button>';
     panel.querySelector('button').addEventListener('click', () => {
       try { localStorage.setItem(noticeKey, 'dismissed'); } catch {}
       panel.remove();
