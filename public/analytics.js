@@ -50,7 +50,8 @@
       const choice = button.dataset.consent;
       storage.set(choice);
       hide();
-      if (choice === 'yes') start();
+      if (choice === 'yes') { start(); dispatchEvent(new Event('scroll')); }
+      else if (enabled) location.reload();
     });
     document.body.append(panel);
   }
@@ -65,10 +66,10 @@
     try { url = new URL(link.href, location.href); } catch { return; }
     if (url.hostname === 'github.com') track('github_click', { repository: url.pathname.split('/').slice(1,3).join('/').slice(0,100) });
     if (link.hasAttribute('download') || url.pathname.startsWith('/files/')) track('file_download', { filename: url.pathname.split('/').pop()?.slice(0,100) || 'file' });
-    if (link.id === 'share') track('share_click');
   });
   document.addEventListener('click', (event) => {
     if (event.target.closest('button.copy-code')) track('code_copy');
+    if (event.target.closest('#share')) track('share_click');
   });
   const search = document.querySelector('#search');
   search?.addEventListener('keydown', (event) => {
@@ -81,6 +82,7 @@
       const total = article.offsetHeight;
       if (total <= 0) return;
       const viewed = Math.max(0, Math.min(1, (innerHeight - rect.top) / total));
+      if (!enabled) return;
       for (const [threshold, name] of [[0.75, 'article_read_75'], [1, 'article_read_100']]) {
         if (viewed >= threshold && !sent.has(name)) { sent.add(name); track(name, { article: location.pathname }); }
       }
