@@ -6,7 +6,7 @@
   "workers_dev": true,
   "vars": {},
   "d1_databases": [
-    { "binding": "DB", "database_name": "volonterski-analytics" }
+    { "binding": "DB", "database_name": "volonterski-analytics", "database_id": "e5ef79ea-3661-4390-8d86-553845f180d8" }
   ],
   "triggers": { "crons": ["0 3 * * *"] }
 }
