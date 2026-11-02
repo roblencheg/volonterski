@@ -2,7 +2,7 @@
 title: "GWM RU: Haval в Home Assistant"
 description: "Моя интеграция Haval с Home Assistant: телеметрия, удалённые команды и шесть карточек Dashboard через российское облако GWM."
 date: 2026-10-29
-updated: 2026-10-29
+updated: 2026-11-02
 tags: ["Haval", "Home Assistant"]
 draft: false
 ---
@@ -31,9 +31,10 @@ draft: false
 
 Я предусмотрел шесть карточек: основную, анимированный пульт в двух ориентациях, Studio в двух ориентациях и карту поездок. У каждой есть визуальный редактор и выбор автомобиля.
 
-![Горизонтальная карточка Studio: состояние автомобиля слева, команды и телеметрия справа](/files/gwm-ru-home-assistant/studio-horizontal.png)
-
-*Мой горизонтальный пульт Studio: состояние автомобиля, управление и телеметрия.*
+<video controls playsinline preload="none" width="1280" height="720" poster="/files/gwm-ru-home-assistant/studio-horizontal.png" aria-label="Видео: пульт GWM RU в Home Assistant со звуком" style="display:block;width:100%;height:auto;aspect-ratio:16/9;border-radius:5px;">
+  <source src="/files/gwm-ru-home-assistant/demo.mp4" type="video/mp4" />
+  <a href="/files/gwm-ru-home-assistant/demo.mp4">Смотреть видео работы GWM RU со звуком</a>
+</video>
 
 В карточках собраны запуск и остановка двигателя, доступ к замкам и багажнику, климат, подогрев сидений, руля и стёкол. Набор зависит от возможностей автомобиля и разрешённых настроек интеграции.
 
