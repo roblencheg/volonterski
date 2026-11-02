@@ -73,7 +73,7 @@ main { flex: 1; min-width: 0; }
 .empty-state p { margin-bottom: 12px; }
 .text-button { border: 0; padding: 6px 0; background: none; color: var(--fg); font-size: 12px; }
 .text-button:hover { color: var(--accent); }
-footer { display: flex; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); padding: 26px 0 30px; color: var(--muted); font-size: 11px; }
+footer { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; border-top: 1px solid var(--line); padding: 26px 0 30px; color: var(--muted); font-size: 11px; }
 footer a:hover { color: var(--fg); }
 .article-page { max-width: 720px; margin: 0 auto; padding: 44px 0 88px; }
 .back-link { display: inline-block; margin-bottom: 40px; color: var(--muted); font-size: 12px; }

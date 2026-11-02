@@ -3,6 +3,8 @@ on:
   push:
     branches: [main]
   pull_request:
+  schedule:
+    - cron: '17 23 * * *'
   workflow_dispatch:
 permissions:
   contents: read
@@ -20,12 +22,14 @@ jobs:
       - run: npm ci
       - run: npm run build
         env:
+          CLOUDFLARE_ANALYTICS_API_TOKEN: ${{ secrets.CLOUDFLARE_ANALYTICS_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ vars.CLOUDFLARE_ACCOUNT_ID }}
           PUBLIC_GOOGLE_SITE_VERIFICATION: ${{ vars.GOOGLE_SITE_VERIFICATION }}
           PUBLIC_YANDEX_SITE_VERIFICATION: ${{ vars.YANDEX_SITE_VERIFICATION }}
           PUBLIC_BING_SITE_VERIFICATION: ${{ vars.BING_SITE_VERIFICATION }}
           PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN: ${{ vars.CLOUDFLARE_WEB_ANALYTICS_TOKEN || '6512ecc0947f4285944dfb6224240140' }}
       - run: npm run verify
-      - run: node --test tests/promotion.test.mjs
+      - run: node --test tests/*.test.mjs
       - uses: actions/upload-pages-artifact@v3
         if: github.event_name != 'pull_request'
         with:

@@ -1,11 +1,16 @@
 ---
 import '../styles/global.css';
+import { getSiteStats } from '../lib/site-stats.mjs';
 import { imageURL, safeJSON } from '../lib/seo';
 const { title = 'Записи', description = 'Практические статьи о разработке, Home Assistant, AI-ботах, автомобилях и электронике.', noindex = false, image = imageURL('index'), article = null, structuredData = null } = Astro.props;
 const cloudflareToken = (import.meta.env.PUBLIC_CLOUDFLARE_WEB_ANALYTICS_TOKEN || '').trim();
 if (cloudflareToken && !/^[a-f0-9]{32}$/i.test(cloudflareToken)) {
   throw new Error('Invalid Cloudflare Web Analytics site token');
 }
+const stats = import.meta.env.PROD ? await getSiteStats() : null;
+const plural = new Intl.PluralRules('ru');
+const number = new Intl.NumberFormat('ru-RU');
+const countLabel = (value: number, forms: Record<string, string>) => `${number.format(value)} ${forms[plural.select(value)] || forms.other}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
@@ -41,7 +46,12 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       </nav>
     </header>
     <main id="main"><slot /></main>
-    <footer><a href="/rss.xml">RSS</a></footer>
+    <footer>
+      <a href="/rss.xml">RSS</a>
+      {stats && <span class="site-stats" title={`Cloudflare · обновлено ${new Date(stats.updated).toLocaleString('ru-RU', { timeZone: 'Asia/Novosibirsk' })} (НСК)`}>
+        За 30 дней: {countLabel(stats.visits, { one: 'посещение', few: 'посещения', other: 'посещений' })} · {countLabel(stats.pageViews, { one: 'просмотр', few: 'просмотра', other: 'просмотров' })}
+      </span>}
+    </footer>
   </div>
   {import.meta.env.PROD && cloudflareToken && <script is:inline defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon={JSON.stringify({ token: cloudflareToken })}></script>}
   <script>
